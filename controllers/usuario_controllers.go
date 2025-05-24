@@ -8,13 +8,27 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetUsuarios(c *gin.Context) {
-	usuarios, err := services.ObtenerUsuarios()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "error al obtener usuarios"})
+func GetUsuariosPorRol(c *gin.Context) {
+	rol := c.Query("rol")
+
+	if rol == "" {
+		// Si no hay rol → devuelve todos
+		usuarios, err := services.ObtenerUsuarios()
+		if err != nil {
+			c.JSON(500, gin.H{"error": "Error al obtener usuarios"})
+			return
+		}
+		c.JSON(200, usuarios)
 		return
 	}
-	c.JSON(http.StatusOK, usuarios)
+
+	// Si hay rol → filtra
+	usuarios, err := services.ObtenerUsuariosPorRol(rol)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Error al filtrar por rol"})
+		return
+	}
+	c.JSON(200, usuarios)
 }
 
 func PostUsuario(c *gin.Context) {

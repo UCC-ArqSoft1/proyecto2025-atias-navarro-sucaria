@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/UCC-ArqSoft1/proyecto2025-atias-navarro-sucaria/db"
@@ -23,5 +24,12 @@ func CrearUsuario(input dto.CreateUsuarioDTO) (models.Usuario, error) {
 func ObtenerUsuarios() ([]models.Usuario, error) {
 	var usuarios []models.Usuario
 	err := db.DB.Find(&usuarios).Error
+	return usuarios, err
+}
+
+func ObtenerUsuariosPorRol(rol string) ([]models.Usuario, error) {
+	fmt.Println("DEBUG - Filtro de rol recibido:", rol) // ← esto te va a mostrar qué recibe
+	var usuarios []models.Usuario
+	err := db.DB.Where("rol = ?", rol).Find(&usuarios).Error
 	return usuarios, err
 }
