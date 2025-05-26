@@ -45,3 +45,15 @@ func PostUsuario(c *gin.Context) {
 	}
 	c.JSON(http.StatusCreated, usuario)
 }
+
+func DeleteUsuario(c *gin.Context) {
+	id := c.Param("id")
+
+	err := services.EliminarUsuarioPorID(id)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "no se pudo eliminar el usuario"})
+		return
+	}
+
+	c.JSON(200, gin.H{"mensaje": "usuario eliminado correctamente"})
+}
