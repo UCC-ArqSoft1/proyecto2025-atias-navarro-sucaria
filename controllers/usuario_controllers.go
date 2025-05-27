@@ -57,3 +57,21 @@ func DeleteUsuario(c *gin.Context) {
 
 	c.JSON(200, gin.H{"mensaje": "usuario eliminado correctamente"})
 }
+
+func UpdateUsuario(c *gin.Context) {
+	id := c.Param("id")
+	var input dto.UpdateUsuarioDTO
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(400, gin.H{"error": "entrada inválida"})
+		return
+	}
+
+	err := services.ActualizarUsuario(id, input)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "no se pudo actualizar el usuario"})
+		return
+	}
+
+	c.JSON(200, gin.H{"mensaje": "usuario actualizado"})
+}

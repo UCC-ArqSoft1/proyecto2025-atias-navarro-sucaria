@@ -38,3 +38,22 @@ func ObtenerUsuariosPorRol(rol string) ([]models.Usuario, error) {
 func EliminarUsuarioPorID(id string) error {
 	return db.DB.Where("id = ?", id).Delete(&models.Usuario{}).Error
 }
+
+func ActualizarUsuario(id string, input dto.UpdateUsuarioDTO) error {
+	var usuario models.Usuario
+
+	if err := db.DB.First(&usuario, id).Error; err != nil {
+		return err
+	}
+
+	usuario.Nombre = input.Nombre
+	usuario.Email = input.Email
+	usuario.Rol = input.Rol
+
+	// Si se quiere actualizar la contraseña:
+	if input.Password != "" {
+		usuario.PasswordHash = utils.HashSHA256(input.Password)
+	}
+
+	return db.DB.Save(&usuario).Error
+}

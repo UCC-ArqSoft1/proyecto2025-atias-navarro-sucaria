@@ -7,5 +7,7 @@ func RegisterRoutes(r *gin.Engine) {
 	r.GET("/usuarios/", GetUsuariosPorRol)
 	r.POST("/login", Login)
 	r.DELETE("/usuarios/:id", DeleteUsuario)
+	r.PUT("/usuarios/:id", UpdateUsuario)
 
+	r.POST("/actividades", PostActividad)
 }

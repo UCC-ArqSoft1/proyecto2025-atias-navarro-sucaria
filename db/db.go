@@ -32,5 +32,5 @@ func InitDB() {
 		log.Fatal("No se pudo conectar a la base de datos:", err)
 	}
 
-	DB.AutoMigrate(&models.Usuario{}) //&models.Actividad{}, &models.Inscripcion{})
+	DB.AutoMigrate(&models.Usuario{}, &models.Actividad{}) // &models.Inscripcion{})
 }
