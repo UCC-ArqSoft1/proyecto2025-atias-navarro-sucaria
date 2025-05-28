@@ -20,3 +20,38 @@ func CrearActividad(input dto.CreateActividadDTO) (models.Actividad, error) {
 	err := db.DB.Create(&actividad).Error
 	return actividad, err
 }
+
+func ObtenerActividades() ([]models.Actividad, error) {
+	var actividades []models.Actividad
+	err := db.DB.Find(&actividades).Error
+	return actividades, err
+}
+
+func ObtenerActividadPorID(id string) (models.Actividad, error) {
+	var actividad models.Actividad
+	err := db.DB.First(&actividad, id).Error
+	return actividad, err
+}
+
+func ActualizarActividad(id string, input models.Actividad) error {
+	var actividad models.Actividad
+
+	if err := db.DB.First(&actividad, id).Error; err != nil {
+		return err
+	}
+
+	actividad.Titulo = input.Titulo
+	actividad.Descripcion = input.Descripcion
+	actividad.Dia = input.Dia
+	actividad.Horario = input.Horario
+	actividad.Duracion = input.Duracion
+	actividad.Cupo = input.Cupo
+	actividad.Categoria = input.Categoria
+	actividad.Instructor = input.Instructor
+
+	return db.DB.Save(&actividad).Error
+}
+
+func EliminarActividadPorID(id string) error {
+	return db.DB.Where("id = ?", id).Delete(&models.Actividad{}).Error
+}
