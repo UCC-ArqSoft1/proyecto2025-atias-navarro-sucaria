@@ -11,8 +11,3 @@ type Actividad struct {
 	Categoria   string
 	Instructor  string
 }
-
-// Esto asegura el nombre correcto
-func (Actividad) TableName() string {
-	return "actividades"
-}
