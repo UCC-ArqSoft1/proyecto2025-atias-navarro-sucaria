@@ -18,7 +18,11 @@ func CrearUsuario(input dto.CreateUsuarioDTO) (models.Usuario, error) {
 		Rol:          input.Rol,
 		FechaAlta:    time.Now(),
 	}
+
 	err := db.DB.Create(&usuario).Error
+	if err != nil {
+		fmt.Println("❌ Error al crear usuario:", err)
+	}
 	return usuario, err
 }
 
