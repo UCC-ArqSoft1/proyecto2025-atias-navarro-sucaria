@@ -20,6 +20,7 @@ func RegisterRoutes(r *gin.Engine) {
 	r.POST("/inscripciones", PostInscripcion)
 	r.GET("/mis-actividades", GetMisActividades)
 	r.GET("/actividades/:id/inscripciones", GetInscriptosPorActividad)
+	r.GET("/inscripciones/:id/check", CheckInscripcion)
 	r.DELETE("/inscripciones/:id", DeleteInscripcion)
 
 }

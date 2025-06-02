@@ -11,3 +11,7 @@ type Actividad struct {
 	Categoria   string `json:"categoria"`
 	Instructor  string `json:"instructor"`
 }
+
+func (Actividad) TableName() string {
+	return "actividads"
+}

@@ -10,7 +10,6 @@ import (
 )
 
 func CrearInscripcion(usuarioID uint, input dto.CreateInscripcionDTO) error {
-	// 1. Verificar si ya está inscripto
 	var existente models.Inscripcion
 	err := db.DB.Where("usuario_id = ? AND actividad_id = ?", usuarioID, input.ActividadID).
 		First(&existente).Error
@@ -19,7 +18,6 @@ func CrearInscripcion(usuarioID uint, input dto.CreateInscripcionDTO) error {
 		return errors.New("ya estás inscripto en esta actividad")
 	}
 
-	// 2. Verificar si el cupo está lleno
 	var actividad models.Actividad
 	err = db.DB.First(&actividad, input.ActividadID).Error
 	if err != nil {
@@ -35,7 +33,6 @@ func CrearInscripcion(usuarioID uint, input dto.CreateInscripcionDTO) error {
 		return errors.New("el cupo de la actividad ya está completo")
 	}
 
-	// 3. Crear inscripción
 	inscripcion := models.Inscripcion{
 		UsuarioID:     usuarioID,
 		ActividadID:   input.ActividadID,
@@ -49,9 +46,9 @@ func ObtenerActividadesPorUsuarioID(usuarioID uint) ([]models.Actividad, error) 
 	var actividades []models.Actividad
 
 	err := db.DB.
-		Table("actividades").
-		Select("actividades.*").
-		Joins("inner join inscripciones on inscripciones.actividad_id = actividades.id").
+		Table("actividads").
+		Select("actividads.*").
+		Joins("inner join inscripciones on inscripciones.actividad_id = actividads.id").
 		Where("inscripciones.usuario_id = ?", usuarioID).
 		Find(&actividades).Error
 
@@ -73,4 +70,22 @@ func ObtenerInscriptosPorActividadID(actividadID string) ([]models.Usuario, erro
 
 func EliminarInscripcionPorID(id string) error {
 	return db.DB.Where("id = ?", id).Delete(&models.Inscripcion{}).Error
+}
+
+// ✅ NUEVO: Verifica si un usuario está inscripto a una actividad
+func EstaInscripto(usuarioID, actividadID uint) (bool, error) {
+	var inscripcion models.Inscripcion
+	err := db.DB.
+		Where("usuario_id = ? AND actividad_id = ?", usuarioID, actividadID).
+		First(&inscripcion).Error
+
+	if err != nil {
+		return false, nil // No encontrado no es error
+	}
+	return true, nil
+}
+
+func EliminarInscripcion(usuarioID uint, actividadID string) error {
+	return db.DB.Where("usuario_id = ? AND actividad_id = ?", usuarioID, actividadID).
+		Delete(&models.Inscripcion{}).Error
 }
