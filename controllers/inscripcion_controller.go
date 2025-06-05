@@ -3,37 +3,38 @@ package controllers
 import (
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/UCC-ArqSoft1/proyecto2025-atias-navarro-sucaria/dto"
 	"github.com/UCC-ArqSoft1/proyecto2025-atias-navarro-sucaria/services"
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
 )
 
 // POST /inscripciones
 func PostInscripcion(c *gin.Context) {
 	var input dto.CreateInscripcionDTO
 
-	if err := c.ShouldBindBodyWith(&input, binding.JSON); err != nil {
+	if err := c.ShouldBindJSON(&input); err != nil {
 		fmt.Println("🔴 Error al parsear JSON:", err)
 		c.JSON(400, gin.H{"error": "Entrada inválida: " + err.Error()})
 		return
 	}
 
-	fmt.Printf("📥 JSON recibido: actividad_id = %v (tipo: %T)\n", input.ActividadID, input.ActividadID)
+	usuarioIDRaw, existe := c.Get("usuarioID")
+	if !existe {
+		c.JSON(401, gin.H{"error": "Usuario no autenticado"})
+		return
+	}
+	usuarioID, ok := usuarioIDRaw.(uint)
+	if !ok {
+		c.JSON(500, gin.H{"error": "ID de usuario inválido"})
+		return
+	}
 
-	usuarioID := uint(1) // 🔧 Simulado
+	fmt.Printf("📥 Inscribiendo usuario %d a actividad %d\n", usuarioID, input.ActividadID)
+
 	err := services.CrearInscripcion(usuarioID, input)
 	if err != nil {
-		if strings.Contains(err.Error(), "ya estás inscripto") ||
-			strings.Contains(err.Error(), "actividad no encontrada") ||
-			strings.Contains(err.Error(), "cupo") {
-			c.JSON(400, gin.H{"error": err.Error()})
-		} else {
-			fmt.Println("🔧 Error interno:", err)
-			c.JSON(500, gin.H{"error": "No se pudo crear la inscripción"})
-		}
+		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -42,7 +43,17 @@ func PostInscripcion(c *gin.Context) {
 
 // GET /mis-actividades
 func GetMisActividades(c *gin.Context) {
-	usuarioID := uint(1) // 🔧 Simulado
+	usuarioIDRaw, existe := c.Get("usuarioID")
+	if !existe {
+		c.JSON(401, gin.H{"error": "Usuario no autenticado"})
+		return
+	}
+	usuarioID, ok := usuarioIDRaw.(uint)
+	if !ok {
+		c.JSON(500, gin.H{"error": "Error interno al leer el ID del usuario"})
+		return
+	}
+
 	fmt.Println("👤 Buscando actividades para usuario:", usuarioID)
 
 	actividades, err := services.ObtenerActividadesPorUsuarioID(usuarioID)
@@ -77,7 +88,16 @@ func CheckInscripcion(c *gin.Context) {
 		return
 	}
 
-	usuarioID := uint(1) // 🔧 Simulado
+	usuarioIDRaw, existe := c.Get("usuarioID")
+	if !existe {
+		c.JSON(401, gin.H{"error": "Usuario no autenticado"})
+		return
+	}
+	usuarioID, ok := usuarioIDRaw.(uint)
+	if !ok {
+		c.JSON(500, gin.H{"error": "Error interno al leer el ID del usuario"})
+		return
+	}
 
 	inscripto, err := services.EstaInscripto(usuarioID, uint(actividadID))
 	if err != nil {
@@ -91,8 +111,18 @@ func CheckInscripcion(c *gin.Context) {
 
 // DELETE /inscripciones/:id
 func DeleteInscripcion(c *gin.Context) {
-	usuarioID := uint(1) // 🔧 Simulado
 	actividadID := c.Param("id")
+
+	usuarioIDRaw, existe := c.Get("usuarioID")
+	if !existe {
+		c.JSON(401, gin.H{"error": "Usuario no autenticado"})
+		return
+	}
+	usuarioID, ok := usuarioIDRaw.(uint)
+	if !ok {
+		c.JSON(500, gin.H{"error": "Error interno al leer el ID del usuario"})
+		return
+	}
 
 	err := services.EliminarInscripcion(usuarioID, actividadID)
 	if err != nil {

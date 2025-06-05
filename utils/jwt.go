@@ -1,34 +1,24 @@
 package utils
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-const (
-	jwtDuration = 24 * time.Hour
-	jwtSecret   = "JwtSecret"
-)
+const jwtDuration = 24 * time.Hour
 
 func GenerateJWT(userID int) (string, error) {
-	expirationTime := time.Now().Add(jwtDuration)
-
-	claims := &jwt.RegisteredClaims{
-		ExpiresAt: jwt.NewNumericDate(expirationTime),
-		IssuedAt:  jwt.NewNumericDate(time.Now()),
-		NotBefore: jwt.NewNumericDate(time.Now()),
-		Issuer:    "backend",
-		Subject:   "auth",
-		ID:        fmt.Sprintf("%d", userID),
+	claims := jwt.MapClaims{
+		"user_id": userID,
+		"exp":     time.Now().Add(jwtDuration).Unix(),
+		"iat":     time.Now().Unix(),
+		"nbf":     time.Now().Unix(),
+		"iss":     "backend",
+		"sub":     "auth",
+		"jti":     time.Now().Format("20060102150405"),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	tokenString, err := token.SignedString([]byte(jwtSecret))
-	if err != nil {
-		return "", fmt.Errorf("error generating token: %w", err)
-	}
-	return tokenString, nil
+	return token.SignedString(JWT_SECRET)
 }
