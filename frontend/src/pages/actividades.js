@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Actividades() {
   const [actividades, setActividades] = useState([]);
   const [misActividades, setMisActividades] = useState([]);
   const [loadingId, setLoadingId] = useState(null);
+  const [filtro, setFiltro] = useState('');
+  const [actividadExpandida, setActividadExpandida] = useState(null);
+  const [errores, setErrores] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,26 +16,20 @@ function Actividades() {
 
     if (!token) {
       console.warn("⛔ No hay token: redirigiendo a login");
-      navigate("/login"); // Redirige si no hay token
+      navigate("/login");
       return;
     }
 
     const fetchData = async () => {
       try {
-        // Traer todas las actividades (pública)
         const actividadesRes = await axios.get('http://localhost:8080/actividades');
         setActividades(actividadesRes.data);
-        console.log("🎯 Actividades recibidas:", actividadesRes.data);
-
-        // Traer actividades a las que estoy inscripto (requiere token)
         const misActRes = await axios.get('http://localhost:8080/mis-actividades', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setMisActividades(misActRes.data.map(act => act.id));
-        console.log("📌 Mis actividades:", misActRes.data);
-
       } catch (err) {
-        console.error("🚨 Error al obtener actividades o inscripciones:", err.response?.data || err.message);
+        console.error("🚨 Error al obtener actividades:", err.response?.data || err.message);
         alert('Error al cargar actividades');
       }
     };
@@ -43,15 +39,13 @@ function Actividades() {
 
   const inscribirse = async (actividadId) => {
     const token = localStorage.getItem("token");
-
     if (!token) {
       alert("No hay token. Iniciá sesión.");
       return;
     }
-
     try {
+      setErrores((prev) => ({ ...prev, [actividadId]: null }));
       setLoadingId(actividadId);
-
       await axios.post(
         "http://localhost:8080/inscripciones",
         { actividad_id: actividadId },
@@ -62,12 +56,11 @@ function Actividades() {
           }
         }
       );
-
       setMisActividades((prev) => [...prev, actividadId]);
       alert("✅ Inscripción exitosa");
     } catch (error) {
-      console.error("❌ Error al inscribirse:", error.response?.data || error.message);
-      alert("❌ No se pudo inscribir");
+      const mensaje = error.response?.data?.error || "❌ No se pudo inscribir";
+      setErrores((prev) => ({ ...prev, [actividadId]: mensaje }));
     } finally {
       setLoadingId(null);
     }
@@ -75,83 +68,157 @@ function Actividades() {
 
   const cancelarInscripcion = async (actividadId) => {
     const token = localStorage.getItem("token");
-
     if (!token) {
       alert("No hay token. Iniciá sesión.");
       return;
     }
-
     try {
+      setErrores((prev) => ({ ...prev, [actividadId]: null }));
       setLoadingId(actividadId);
-
       await axios.delete(`http://localhost:8080/inscripciones/${actividadId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-
       setMisActividades((prev) => prev.filter((id) => id !== actividadId));
       alert("❎ Inscripción cancelada");
     } catch (error) {
-      console.error("❌ Error al cancelar inscripción:", error.response?.data || error.message);
-      alert("❌ No se pudo cancelar la inscripción");
+      const mensaje = error.response?.data?.error || "❌ No se pudo cancelar";
+      setErrores((prev) => ({ ...prev, [actividadId]: mensaje }));
     } finally {
       setLoadingId(null);
     }
   };
-return (
-  <div>
-    <h2>Lista de Actividades</h2>
 
-    <Link
-  to="/buscar-actividad"
-  style={{
-    display: 'inline-block',
-    padding: '8px 16px',
-    backgroundColor: '#B22222',
-    color: '#fff',
-    textDecoration: 'none',
-    borderRadius: '4px',
-    marginBottom: '20px',
-    border: 'none',
-    fontSize: '14px',
-    cursor: 'pointer'
-  }}
->
-  🔎 Buscar Actividad por ID
-</Link>
+  const toggleDetalle = (id) => {
+    setActividadExpandida((prev) => (prev === id ? null : id));
+  };
 
-    <ul>
-      {actividades.map((act) => {
-        const id = Number(act.id);
-        const yaInscripto = misActividades.includes(id);
+  const actividadesFiltradas = actividades.filter((act) => {
+    const buscar = filtro.toLowerCase();
+    return (
+      act.titulo.toLowerCase().includes(buscar) ||
+      act.categoria.toLowerCase().includes(buscar) ||
+      act.dia.toLowerCase().includes(buscar)
+    );
+  });
 
-        return (
-          <li key={id}>
-            <strong>{act.titulo}</strong> – {act.dia} a las {act.horario}
-            <br />
-            {yaInscripto ? (
-              <button
-                onClick={() => cancelarInscripcion(id)}
-                disabled={loadingId === id}
-              >
-                {loadingId === id ? "Cancelando..." : "Cancelar inscripción"}
-              </button>
-            ) : (
-              <button
-                onClick={() => inscribirse(id)}
-                disabled={loadingId === id}
-              >
-                {loadingId === id ? "Inscribiendo..." : "Inscribirme"}
-              </button>
-            )}
-          </li>
-        );
-      })}
-    </ul>
-  </div>
-);
+  return (
+    <div
+      style={{
+        backgroundImage: "url('/fondo_actividades.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        minHeight: '100vh',
+        padding: '40px'
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.92)',
+          padding: '30px',
+          borderRadius: '10px',
+          maxWidth: '800px',
+          margin: '0 auto',
+          boxShadow: '0 0 10px rgba(0,0,0,0.2)'
+        }}
+      >
+        <button
+          onClick={() => {
+            localStorage.removeItem("token");
+            alert("Sesión cerrada");
+            navigate("/");
+          }}
+          style={{
+            backgroundColor: "#888",
+            color: "#fff",
+            border: "none",
+            padding: "8px 16px",
+            borderRadius: "4px",
+            cursor: "pointer",
+            marginBottom: "20px"
+          }}
+        >
+          🔒 Cerrar sesión
+        </button>
 
+        <h2 style={{ marginBottom: '20px' }}>Lista de Actividades</h2>
+
+        <Link
+          to="/buscar-actividad"
+          style={{
+            display: 'inline-block',
+            padding: '8px 16px',
+            backgroundColor: '#B22222',
+            color: '#fff',
+            textDecoration: 'none',
+            borderRadius: '4px',
+            marginBottom: '20px',
+            border: 'none',
+            fontSize: '14px',
+            cursor: 'pointer'
+          }}
+        >
+          🔎 Buscar Actividad por ID
+        </Link>
+
+        <input
+          type="text"
+          placeholder="Buscar por título, categoría o día..."
+          value={filtro}
+          onChange={(e) => setFiltro(e.target.value)}
+          style={{
+            display: 'block',
+            marginTop: '10px',
+            marginBottom: '20px',
+            padding: '8px',
+            width: '100%',
+            maxWidth: '400px'
+          }}
+        />
+
+        <ul style={{ listStyle: 'none', padding: 0 }}>
+          {actividadesFiltradas.map((act) => {
+            const id = Number(act.id);
+            const yaInscripto = misActividades.includes(id);
+            const estaExpandida = actividadExpandida === id;
+            const error = errores[id];
+
+            return (
+              <li key={id} style={{ marginBottom: '20px', paddingBottom: '10px', borderBottom: '1px solid #ccc' }}>
+                <strong>{act.titulo}</strong> – {act.dia} a las {act.horario}
+                <br />
+                {yaInscripto ? (
+                  <button onClick={() => cancelarInscripcion(id)} disabled={loadingId === id}>
+                    {loadingId === id ? "Cancelando..." : "Cancelar inscripción"}
+                  </button>
+                ) : (
+                  <button onClick={() => inscribirse(id)} disabled={loadingId === id}>
+                    {loadingId === id ? "Inscribiendo..." : "Inscribirme"}
+                  </button>
+                )}
+                <button onClick={() => toggleDetalle(id)} style={{ marginLeft: '10px' }}>
+                  {estaExpandida ? "Ocultar detalles" : "Ver detalles"}
+                </button>
+                {error && (
+                  <div style={{ color: 'red', marginTop: '5px' }}>
+                    ⚠️ {error}
+                  </div>
+                )}
+                {estaExpandida && (
+                  <div style={{ marginTop: '5px', paddingLeft: '10px' }}>
+                    <p><strong>Descripción:</strong> {act.descripcion}</p>
+                    <p><strong>Duración:</strong> {act.duracion} minutos</p>
+                    <p><strong>Cupo:</strong> {act.cupo} personas</p>
+                    <p><strong>Categoría:</strong> {act.categoria}</p>
+                    <p><strong>Instructor:</strong> {act.instructor}</p>
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </div>
+  );
 }
 
 export default Actividades;

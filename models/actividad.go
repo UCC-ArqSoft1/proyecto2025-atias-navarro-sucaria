@@ -15,3 +15,8 @@ type Actividad struct {
 func (Actividad) TableName() string {
 	return "actividads"
 }
+
+type ActividadConInscriptos struct {
+	Actividad
+	Inscriptos int `json:"inscriptos"`
+}

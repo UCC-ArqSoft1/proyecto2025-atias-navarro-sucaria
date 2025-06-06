@@ -77,3 +77,17 @@ func DeleteActividad(c *gin.Context) {
 
 	c.JSON(200, gin.H{"mensaje": "actividad eliminada correctamente"})
 }
+
+func FiltrarActividades(c *gin.Context) {
+	clave := c.Query("clave")
+	categoria := c.Query("categoria")
+	horario := c.Query("horario")
+
+	actividades, err := services.FiltrarActividades(clave, categoria, horario)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "No se pudieron obtener las actividades"})
+		return
+	}
+
+	c.JSON(200, actividades)
+}

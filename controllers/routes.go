@@ -33,7 +33,11 @@ func RegisterRoutes(r *gin.Engine) {
 	r.POST("/register", Register)
 
 	r.GET("/actividades", GetActividades)
+	r.GET("/actividades/filtrar", FiltrarActividades)
 	r.GET("/actividades/:id", GetActividadPorID)
+
+	r.POST("/actividades", PostActividad)
+	r.PUT("/actividades/:id", PutActividad)
 
 	// Rutas protegidas con JWT
 	auth := r.Group("/")
@@ -44,9 +48,6 @@ func RegisterRoutes(r *gin.Engine) {
 		auth.DELETE("/usuarios/:id", DeleteUsuario)
 		auth.PUT("/usuarios/:id", UpdateUsuario)
 
-		auth.POST("/actividades", PostActividad)
-
-		auth.PUT("/actividades/:id", PutActividad)
 		auth.DELETE("/actividades/:id", DeleteActividad)
 
 		auth.POST("/inscripciones", PostInscripcion)
