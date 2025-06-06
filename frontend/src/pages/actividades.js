@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
 function Actividades() {
@@ -98,41 +99,59 @@ function Actividades() {
       setLoadingId(null);
     }
   };
+return (
+  <div>
+    <h2>Lista de Actividades</h2>
 
-  return (
-    <div>
-      <h2>Lista de Actividades</h2>
+    <Link
+  to="/buscar-actividad"
+  style={{
+    display: 'inline-block',
+    padding: '8px 16px',
+    backgroundColor: '#B22222',
+    color: '#fff',
+    textDecoration: 'none',
+    borderRadius: '4px',
+    marginBottom: '20px',
+    border: 'none',
+    fontSize: '14px',
+    cursor: 'pointer'
+  }}
+>
+  🔎 Buscar Actividad por ID
+</Link>
 
-      <ul>
-        {actividades.map((act) => {
-          const id = Number(act.id);
-          const yaInscripto = misActividades.includes(id);
+    <ul>
+      {actividades.map((act) => {
+        const id = Number(act.id);
+        const yaInscripto = misActividades.includes(id);
 
-          return (
-            <li key={id}>
-              <strong>{act.titulo}</strong> – {act.dia} a las {act.horario}
-              <br />
-              {yaInscripto ? (
-                <button
-                  onClick={() => cancelarInscripcion(id)}
-                  disabled={loadingId === id}
-                >
-                  {loadingId === id ? "Cancelando..." : "Cancelar inscripción"}
-                </button>
-              ) : (
-                <button
-                  onClick={() => inscribirse(id)}
-                  disabled={loadingId === id}
-                >
-                  {loadingId === id ? "Inscribiendo..." : "Inscribirme"}
-                </button>
-              )}
-            </li>
-          );
-        })}
-      </ul>
-    </div>
-  );
+        return (
+          <li key={id}>
+            <strong>{act.titulo}</strong> – {act.dia} a las {act.horario}
+            <br />
+            {yaInscripto ? (
+              <button
+                onClick={() => cancelarInscripcion(id)}
+                disabled={loadingId === id}
+              >
+                {loadingId === id ? "Cancelando..." : "Cancelar inscripción"}
+              </button>
+            ) : (
+              <button
+                onClick={() => inscribirse(id)}
+                disabled={loadingId === id}
+              >
+                {loadingId === id ? "Inscribiendo..." : "Inscribirme"}
+              </button>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+);
+
 }
 
 export default Actividades;
