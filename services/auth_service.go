@@ -23,7 +23,7 @@ func Login(input dto.LoginDTO) (string, error) {
 		return "", errors.New("contraseña incorrecta")
 	}
 
-	token, err := utils.GenerateJWT(int(usuario.ID))
+	token, err := utils.GenerateJWT(int(usuario.ID), usuario.Rol)
 	if err != nil {
 		return "", errors.New("error generando token")
 	}

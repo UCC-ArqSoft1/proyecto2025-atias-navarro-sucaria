@@ -33,7 +33,7 @@ func ObtenerActividadPorID(id string) (models.Actividad, error) {
 	return actividad, err
 }
 
-func ActualizarActividad(id string, input models.Actividad) error {
+func ActualizarActividad(id string, input dto.CreateActividadDTO) error {
 	var actividad models.Actividad
 
 	if err := db.DB.First(&actividad, id).Error; err != nil {
@@ -56,15 +56,15 @@ func EliminarActividadPorID(id string) error {
 	return db.DB.Where("id = ?", id).Delete(&models.Actividad{}).Error
 }
 
-func FiltrarActividades(clave, categoria, horario string) ([]models.Actividad, error) {
+func FiltrarActividades(clave, dia, horario string) ([]models.Actividad, error) {
 	var actividades []models.Actividad
 	query := db.DB.Model(&models.Actividad{})
 
 	if clave != "" {
 		query = query.Where("titulo LIKE ? OR descripcion LIKE ?", "%"+clave+"%", "%"+clave+"%")
 	}
-	if categoria != "" {
-		query = query.Where("categoria = ?", categoria)
+	if dia != "" {
+		query = query.Where("dia = ?", dia)
 	}
 	if horario != "" {
 		query = query.Where("horario = ?", horario)

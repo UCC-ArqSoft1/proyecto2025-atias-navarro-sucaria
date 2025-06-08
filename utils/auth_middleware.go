@@ -64,9 +64,18 @@ func AuthMiddleware() gin.HandlerFunc {
 				return
 			}
 
+			rol, ok := claims["rol"].(string)
+			if !ok {
+				fmt.Println("❌ Claim 'rol' no válido:", claims["rol"])
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Token sin rol válido"})
+				c.Abort()
+				return
+			}
+
 			usuarioID := uint(uidFloat)
-			fmt.Println("🛡️ Usuario autenticado con ID:", usuarioID)
+			fmt.Println("🛡️ Usuario autenticado con ID:", usuarioID, "y rol:", rol)
 			c.Set("usuarioID", usuarioID)
+			c.Set("rol", rol)
 		} else {
 			fmt.Println("❌ No se pudieron leer los claims")
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "No se pudieron leer los claims"})

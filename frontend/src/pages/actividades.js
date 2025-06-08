@@ -9,6 +9,7 @@ function Actividades() {
   const [filtro, setFiltro] = useState('');
   const [actividadExpandida, setActividadExpandida] = useState(null);
   const [errores, setErrores] = useState({});
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,6 +19,14 @@ function Actividades() {
       console.warn("⛔ No hay token: redirigiendo a login");
       navigate("/login");
       return;
+    }
+
+    // Verificar si el usuario es administrador
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      setIsAdmin(payload.rol === 'administrador');
+    } catch (error) {
+      console.error('Error al decodificar el token:', error);
     }
 
     const fetchData = async () => {
@@ -121,6 +130,26 @@ function Actividades() {
           boxShadow: '0 0 10px rgba(0,0,0,0.2)'
         }}
       >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h1 style={{ color: '#B22222', margin: 0 }}>Actividades</h1>
+          <div>
+            {isAdmin && (
+              <Link
+                to="/admin"
+                style={{
+                  backgroundColor: '#B22222',
+                  color: 'white',
+                  padding: '10px 20px',
+                  textDecoration: 'none',
+                  borderRadius: '4px'
+                }}
+              >
+                Panel de Administración
+              </Link>
+            )}
+          </div>
+        </div>
+
         <button
           onClick={() => {
             localStorage.removeItem("token");

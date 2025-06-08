@@ -8,9 +8,10 @@ import (
 
 const jwtDuration = 24 * time.Hour
 
-func GenerateJWT(userID int) (string, error) {
+func GenerateJWT(userID int, rol string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
+		"rol":     rol,
 		"exp":     time.Now().Add(jwtDuration).Unix(),
 		"iat":     time.Now().Unix(),
 		"nbf":     time.Now().Unix(),
