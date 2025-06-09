@@ -3,6 +3,9 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -185,4 +188,57 @@ func FiltrarActividades(c *gin.Context) {
 	}
 
 	c.JSON(200, actividades)
+}
+
+func UploadActividadImagen(c *gin.Context) {
+	// Verificar autenticación y rol
+	if _, existe := c.Get("usuarioID"); !existe {
+		fmt.Println("❌ Usuario no autenticado")
+		c.JSON(401, gin.H{"error": "Usuario no autenticado"})
+		return
+	}
+
+	// Verificar rol de administrador
+	rolRaw, existe := c.Get("rol")
+	if !existe {
+		fmt.Println("❌ Rol no encontrado en el token")
+		c.JSON(403, gin.H{"error": "Rol no encontrado en el token"})
+		return
+	}
+
+	rol, ok := rolRaw.(string)
+	if !ok || rol != "administrador" {
+		fmt.Println("❌ Rol no es administrador:", rol)
+		c.JSON(403, gin.H{"error": "No tienes permisos para realizar esta acción"})
+		return
+	}
+
+	// Obtener el archivo
+	file, err := c.FormFile("imagen")
+	if err != nil {
+		c.JSON(400, gin.H{"error": "No se pudo obtener el archivo"})
+		return
+	}
+
+	// Crear directorio si no existe
+	uploadDir := "./uploads"
+	if err := os.MkdirAll(uploadDir, 0755); err != nil {
+		c.JSON(500, gin.H{"error": "No se pudo crear el directorio de uploads"})
+		return
+	}
+
+	// Generar nombre único para el archivo
+	filename := fmt.Sprintf("%d%s", time.Now().UnixNano(), filepath.Ext(file.Filename))
+	filepath := filepath.Join(uploadDir, filename)
+
+	// Guardar el archivo
+	if err := c.SaveUploadedFile(file, filepath); err != nil {
+		c.JSON(500, gin.H{"error": "No se pudo guardar el archivo"})
+		return
+	}
+
+	// Devolver la URL relativa del archivo
+	c.JSON(200, gin.H{
+		"url": fmt.Sprintf("/uploads/%s", filename),
+	})
 }

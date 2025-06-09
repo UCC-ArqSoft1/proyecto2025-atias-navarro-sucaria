@@ -10,6 +10,7 @@ type Actividad struct {
 	Cupo        int    `json:"cupo"`
 	Categoria   string `json:"categoria"`
 	Instructor  string `json:"instructor"`
+	Imagen      string `json:"imagen"`
 }
 
 func (Actividad) TableName() string {

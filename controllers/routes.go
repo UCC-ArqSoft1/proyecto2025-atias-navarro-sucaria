@@ -37,6 +37,9 @@ func RegisterRoutes(r *gin.Engine) {
 	r.GET("/actividades/filtrar", FiltrarActividades)
 	r.GET("/actividades/:id", GetActividadPorID)
 
+	// Servir archivos estáticos
+	r.Static("/uploads", "./uploads")
+
 	// Rutas protegidas con JWT
 	auth := r.Group("/")
 	auth.Use(utils.AuthMiddleware())
@@ -51,6 +54,7 @@ func RegisterRoutes(r *gin.Engine) {
 		auth.POST("/actividades", PostActividad)
 		auth.PUT("/actividades/:id", PutActividad)
 		auth.DELETE("/actividades/:id", DeleteActividad)
+		auth.POST("/actividades/upload", UploadActividadImagen)
 
 		// Rutas de inscripciones
 		auth.POST("/inscripciones", PostInscripcion)

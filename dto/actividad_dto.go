@@ -9,4 +9,5 @@ type CreateActividadDTO struct {
 	Cupo        int    `json:"cupo" binding:"required"`
 	Categoria   string `json:"categoria" binding:"required"`
 	Instructor  string `json:"instructor" binding:"required"`
+	Imagen      string `json:"imagen"`
 }

@@ -111,25 +111,22 @@ function Actividades() {
   });
 
   return (
-    <div
-      style={{
-        backgroundImage: "url('/fondo_actividades.jpg')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        minHeight: '100vh',
-        padding: '40px'
-      }}
-    >
-      <div
-        style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.92)',
-          padding: '30px',
-          borderRadius: '10px',
-          maxWidth: '800px',
-          margin: '0 auto',
-          boxShadow: '0 0 10px rgba(0,0,0,0.2)'
-        }}
-      >
+    <div style={{
+      minHeight: '100vh',
+      backgroundImage: 'url("/fondo_actividades.jpg")',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      padding: '20px'
+    }}>
+      <div style={{
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        padding: '20px',
+        borderRadius: '8px',
+        maxWidth: '1200px',
+        margin: '0 auto',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+      }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <h1 style={{ color: '#B22222', margin: 0 }}>Actividades</h1>
           <div>
@@ -213,34 +210,50 @@ function Actividades() {
 
             return (
               <li key={id} style={{ marginBottom: '20px', paddingBottom: '10px', borderBottom: '1px solid #ccc' }}>
-                <strong>{act.titulo}</strong> – {act.dia} a las {act.horario}
-                <br />
-                {yaInscripto ? (
-                  <button onClick={() => cancelarInscripcion(id)} disabled={loadingId === id}>
-                    {loadingId === id ? "Cancelando..." : "Cancelar inscripción"}
-                  </button>
-                ) : (
-                  <button onClick={() => inscribirse(id)} disabled={loadingId === id}>
-                    {loadingId === id ? "Inscribiendo..." : "Inscribirme"}
-                  </button>
-                )}
-                <button onClick={() => toggleDetalle(id)} style={{ marginLeft: '10px' }}>
-                  {estaExpandida ? "Ocultar detalles" : "Ver detalles"}
-                </button>
-                {error && (
-                  <div style={{ color: 'red', marginTop: '5px' }}>
-                    ⚠️ {error}
+                <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+                  {act.imagen && (
+                    <img
+                      src={`http://localhost:8080${act.imagen}`}
+                      alt={act.titulo}
+                      style={{
+                        width: '100px',
+                        height: '100px',
+                        objectFit: 'cover',
+                        borderRadius: '4px'
+                      }}
+                    />
+                  )}
+                  <div>
+                    <strong>{act.titulo}</strong> – {act.dia} a las {act.horario}
+                    <br />
+                    {yaInscripto ? (
+                      <button onClick={() => cancelarInscripcion(id)} disabled={loadingId === id}>
+                        {loadingId === id ? "Cancelando..." : "Cancelar inscripción"}
+                      </button>
+                    ) : (
+                      <button onClick={() => inscribirse(id)} disabled={loadingId === id}>
+                        {loadingId === id ? "Inscribiendo..." : "Inscribirme"}
+                      </button>
+                    )}
+                    <button onClick={() => toggleDetalle(id)} style={{ marginLeft: '10px' }}>
+                      {estaExpandida ? "Ocultar detalles" : "Ver detalles"}
+                    </button>
+                    {error && (
+                      <div style={{ color: 'red', marginTop: '5px' }}>
+                        ⚠️ {error}
+                      </div>
+                    )}
+                    {estaExpandida && (
+                      <div style={{ marginTop: '5px', paddingLeft: '10px' }}>
+                        <p><strong>Descripción:</strong> {act.descripcion}</p>
+                        <p><strong>Duración:</strong> {act.duracion} minutos</p>
+                        <p><strong>Cupo:</strong> {act.cupo} personas</p>
+                        <p><strong>Categoría:</strong> {act.categoria}</p>
+                        <p><strong>Instructor:</strong> {act.instructor}</p>
+                      </div>
+                    )}
                   </div>
-                )}
-                {estaExpandida && (
-                  <div style={{ marginTop: '5px', paddingLeft: '10px' }}>
-                    <p><strong>Descripción:</strong> {act.descripcion}</p>
-                    <p><strong>Duración:</strong> {act.duracion} minutos</p>
-                    <p><strong>Cupo:</strong> {act.cupo} personas</p>
-                    <p><strong>Categoría:</strong> {act.categoria}</p>
-                    <p><strong>Instructor:</strong> {act.instructor}</p>
-                  </div>
-                )}
+                </div>
               </li>
             );
           })}

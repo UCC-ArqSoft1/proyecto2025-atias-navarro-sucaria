@@ -16,6 +16,7 @@ func CrearActividad(input dto.CreateActividadDTO) (models.Actividad, error) {
 		Cupo:        input.Cupo,
 		Categoria:   input.Categoria,
 		Instructor:  input.Instructor,
+		Imagen:      input.Imagen,
 	}
 	err := db.DB.Create(&actividad).Error
 	return actividad, err
@@ -48,6 +49,7 @@ func ActualizarActividad(id string, input dto.CreateActividadDTO) error {
 	actividad.Cupo = input.Cupo
 	actividad.Categoria = input.Categoria
 	actividad.Instructor = input.Instructor
+	actividad.Imagen = input.Imagen
 
 	return db.DB.Save(&actividad).Error
 }
