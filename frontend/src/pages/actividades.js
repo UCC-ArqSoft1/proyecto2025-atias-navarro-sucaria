@@ -13,17 +13,24 @@ function Actividades() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
+    const token = localStorage.getItem('token');
     if (!token) {
-      console.warn("⛔ No hay token: redirigiendo a login");
-      navigate("/login");
+      navigate('/');
+      return;
+    }
+
+    // Verificar expiración del token
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const expirationTime = payload.exp * 1000; // Convertir a milisegundos
+    if (Date.now() >= expirationTime) {
+      localStorage.removeItem('token');
+      alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+      navigate('/');
       return;
     }
 
     // Verificar si el usuario es administrador
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
       setIsAdmin(payload.rol === 'administrador');
     } catch (error) {
       console.error('Error al decodificar el token:', error);
@@ -106,7 +113,8 @@ function Actividades() {
     return (
       act.titulo.toLowerCase().includes(buscar) ||
       act.categoria.toLowerCase().includes(buscar) ||
-      act.dia.toLowerCase().includes(buscar)
+      act.dia.toLowerCase().includes(buscar) ||
+      act.horario.toLowerCase().includes(buscar)
     );
   });
 

@@ -36,8 +36,17 @@ function AdminPanel() {
             return;
         }
 
-        // Verificar si el usuario es administrador
+        // Verificar expiración del token
         const payload = JSON.parse(atob(token.split('.')[1]));
+        const expirationTime = payload.exp * 1000; // Convertir a milisegundos
+        if (Date.now() >= expirationTime) {
+            localStorage.removeItem('token');
+            alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+            navigate('/');
+            return;
+        }
+
+        // Verificar si el usuario es administrador
         if (payload.rol !== 'administrador') {
             navigate('/actividades');
             return;

@@ -1,7 +1,7 @@
 package models
 
 type Actividad struct {
-	ID          uint   `json:"id"`
+	ID          uint   `gorm:"primaryKey" json:"id"`
 	Titulo      string `json:"titulo"`
 	Descripcion string `json:"descripcion"`
 	Dia         string `json:"dia"`

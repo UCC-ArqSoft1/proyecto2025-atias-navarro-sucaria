@@ -7,7 +7,7 @@ function Register() {
     nombre: '',
     email: '',
     password: '',
-    rol: 'admin' // Hardcodeamos el rol como admin
+    rol: 'admin'
   });
   const navigate = useNavigate();
 
