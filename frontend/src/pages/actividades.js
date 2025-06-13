@@ -113,7 +113,7 @@ function Actividades() {
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundImage: 'url("/fondo_actividades.jpg")',
+      backgroundImage: 'url("/fondo_actividades.png")',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',

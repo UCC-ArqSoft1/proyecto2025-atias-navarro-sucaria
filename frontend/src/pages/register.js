@@ -3,7 +3,12 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 function Register() {
-  const [form, setForm] = useState({ nombre: '', email: '', password: '' });
+  const [form, setForm] = useState({
+    nombre: '',
+    email: '',
+    password: '',
+    rol: 'admin' // Hardcodeamos el rol como admin
+  });
   const navigate = useNavigate();
 
   const handleChange = (e) => {

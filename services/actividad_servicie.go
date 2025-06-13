@@ -55,6 +55,12 @@ func ActualizarActividad(id string, input dto.CreateActividadDTO) error {
 }
 
 func EliminarActividadPorID(id string) error {
+	// Primero borro las inscripciones asociadas a la actividad
+	err := db.DB.Where("actividad_id = ?", id).Delete(&models.Inscripcion{}).Error
+	if err != nil {
+		return err
+	}
+	// Luego borro la actividad
 	return db.DB.Where("id = ?", id).Delete(&models.Actividad{}).Error
 }
 

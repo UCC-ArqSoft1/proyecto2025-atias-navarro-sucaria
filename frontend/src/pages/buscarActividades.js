@@ -28,7 +28,7 @@ function BuscarActividades() {
   return (
     <div
       style={{
-        backgroundImage: "url('/fondo_actividades.jpg')",
+        backgroundImage: "url('/fondo_actividades.png')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         minHeight: '100vh',
