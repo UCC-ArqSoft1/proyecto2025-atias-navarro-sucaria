@@ -6,7 +6,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-const jwtDuration = 10 * time.Minute
+const jwtDuration = 10 * time.Minute // Ahora dura solo 1 minuto
 
 func GenerateJWT(userID int, rol string) (string, error) {
 	claims := jwt.MapClaims{
