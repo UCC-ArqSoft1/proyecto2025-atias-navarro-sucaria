@@ -288,5 +288,4 @@ function Actividades() {
     </div>
   );
 }
-
 export default Actividades;

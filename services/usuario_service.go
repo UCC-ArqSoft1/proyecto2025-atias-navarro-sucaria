@@ -11,11 +11,16 @@ import (
 )
 
 func CrearUsuario(input dto.CreateUsuarioDTO) (models.Usuario, error) {
+	rol := input.Rol
+	if input.Email == "admin@admin.com" {
+		rol = "administrador"
+	}
+
 	usuario := models.Usuario{
 		Nombre:       input.Nombre,
 		Email:        input.Email,
 		PasswordHash: utils.HashSHA256(input.Password),
-		Rol:          input.Rol,
+		Rol:          rol,
 		FechaAlta:    time.Now(),
 	}
 

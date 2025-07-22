@@ -11,10 +11,13 @@ import (
 )
 
 func main() {
-	db.InitDB()
+	// ⚠️ Primero cargamos el .env antes de llamar InitDB
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("No se pudo cargar .env")
 	}
+
+	// Ahora sí inicializamos la DB que va a leer las variables de entorno correctamente
+	db.InitDB()
 
 	r := gin.Default()
 
