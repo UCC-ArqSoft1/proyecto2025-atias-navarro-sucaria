@@ -10,6 +10,7 @@ function Actividades() {
   const [actividadExpandida, setActividadExpandida] = useState(null);
   const [errores, setErrores] = useState({});
   const [isAdmin, setIsAdmin] = useState(false);
+  const [mostrarSoloMisActividades, setMostrarSoloMisActividades] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -110,12 +111,13 @@ function Actividades() {
 
   const actividadesFiltradas = actividades.filter((act) => {
     const buscar = filtro.toLowerCase();
-    return (
+    const coincideBusqueda =
       act.titulo.toLowerCase().includes(buscar) ||
       act.categoria.toLowerCase().includes(buscar) ||
       act.dia.toLowerCase().includes(buscar) ||
-      act.horario.toLowerCase().includes(buscar)
-    );
+      act.horario.toLowerCase().includes(buscar);
+    const esMia = misActividades.includes(Number(act.id));
+    return coincideBusqueda && (!mostrarSoloMisActividades || esMia);
   });
 
   return (
@@ -193,6 +195,22 @@ function Actividades() {
         >
           🔎 Buscar Actividad por ID
         </Link>
+
+        <button
+          onClick={() => setMostrarSoloMisActividades((prev) => !prev)}
+          style={{
+            backgroundColor: mostrarSoloMisActividades ? '#B22222' : '#888',
+            color: '#fff',
+            border: 'none',
+            padding: '8px 16px',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            marginBottom: '20px',
+            marginLeft: '10px'
+          }}
+        >
+          {mostrarSoloMisActividades ? 'Ver todas las actividades' : 'Ver mis actividades'}
+        </button>
 
         <input
           type="text"
